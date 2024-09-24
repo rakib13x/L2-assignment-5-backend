@@ -226,6 +226,40 @@ export const cancelBooking = catchAsync(async (req, res) => {
   });
 });
 
+export const approveBooking = catchAsync(async (req, res) => {
+  const bookingId = req.params.id;
+
+  const booking = await BookingServices.getBookingById(bookingId);
+
+  if (!booking) {
+    return sendResponse(res, {
+      statusCode: httpStatus.NOT_FOUND,
+      success: false,
+      message: 'Booking not found.',
+      data: null,
+    });
+  }
+
+  if (booking.status !== 'pending') {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: 'Only pending bookings can be approved.',
+      data: null,
+    });
+  }
+
+  const approvedBooking =
+    await BookingServices.approveBookingService(bookingId);
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking approved successfully.',
+    data: approvedBooking,
+  });
+});
+
 export const bookingControllers = {
   createBooking,
   getMyBookings,
@@ -233,4 +267,5 @@ export const bookingControllers = {
   updateBooking,
   getBookingById,
   cancelBooking,
+  approveBooking,
 };
