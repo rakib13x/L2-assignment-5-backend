@@ -192,10 +192,45 @@ export const updateBooking = catchAsync(async (req, res) => {
   });
 });
 
+export const cancelBooking = catchAsync(async (req, res) => {
+  const bookingId = req.params.id;
+  const userId = req.user._id;
+
+  const booking = await BookingServices.getBookingById(bookingId);
+
+  if (!booking || booking.user.toString() !== userId.toString()) {
+    return sendResponse(res, {
+      statusCode: httpStatus.NOT_FOUND,
+      success: false,
+      message: 'Booking not found or you are not authorized.',
+      data: null,
+    });
+  }
+
+  if (booking.status === 'approved') {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: 'Cannot cancel an approved booking.',
+      data: null,
+    });
+  }
+
+  const canceledBooking = await BookingServices.cancelBookingService(bookingId);
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking canceled successfully.',
+    data: canceledBooking,
+  });
+});
+
 export const bookingControllers = {
   createBooking,
   getMyBookings,
   getAllBookings,
   updateBooking,
   getBookingById,
+  cancelBooking,
 };

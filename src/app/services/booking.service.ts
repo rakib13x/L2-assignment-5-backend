@@ -100,10 +100,22 @@ export const updateBooking = async (
     .exec();
 };
 
+export const cancelBookingService = async (bookingId: string) => {
+  return await BookingModel.findByIdAndUpdate(
+    bookingId,
+    { status: 'canceled' },
+    { new: true },
+  )
+    .populate('user', '_id name email')
+    .populate('car')
+    .exec();
+};
+
 export const BookingServices = {
   createBookingIntoDB,
   getMyBookingsFromDb,
   getAllBookings,
   updateBooking,
   getBookingById,
+  cancelBookingService,
 };
