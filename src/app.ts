@@ -5,6 +5,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
+import path from 'path';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/middleware';
 import router from './app/routes';
@@ -21,6 +22,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // application routes
 app.use('/api/v1', router);

@@ -36,6 +36,7 @@ const loginUser = async (payload: TLoginUser) => {
       role: user.role,
       phone: user.phone,
       address: user.address,
+      profilePhoto: user.profilePhoto,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },

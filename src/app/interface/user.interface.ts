@@ -9,6 +9,7 @@ export interface TUser {
   password: string;
   phone: string;
   address: string;
+  profilePhoto: string | null;
   createdAt: string;
   updatedAt: string;
 }

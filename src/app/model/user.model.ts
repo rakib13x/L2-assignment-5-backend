@@ -31,6 +31,10 @@ const userSchema = new Schema<TUser>(
       type: String,
       required: true,
     },
+    profilePhoto: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -38,18 +42,21 @@ const userSchema = new Schema<TUser>(
 );
 
 userSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this; // doc
-  // hashing password and save into DB
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds),
-  );
+  const user = this; // Document
+
+  // Hash the password before saving
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_rounds),
+    );
+  }
+
   next();
 });
 
 userSchema.post('save', function (doc, next) {
-  doc.password = '';
+  doc.password = ''; // Remove password from the document
   next();
 });
 

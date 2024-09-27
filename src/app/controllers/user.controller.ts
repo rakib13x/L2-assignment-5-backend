@@ -1,35 +1,47 @@
 import httpStatus from 'http-status';
+import { TUser } from '../interface/user.interface';
 import { UserServices } from '../services/user.service';
 import catchAsync from '../utils/catchAsync';
 import sendResponse from '../utils/sendResponse';
-import { createUserValidationSchema } from '../validations/user.validation';
 
 const createUser = catchAsync(async (req, res) => {
-  // Validate using safeParse (non-throwing validation)
-  const validation = createUserValidationSchema.safeParse({ body: req.body });
+  console.log('Processing signup...');
 
-  if (!validation.success) {
-    // Log and send the validation errors
-    console.error('Validation errors:', validation.error.errors);
-    return res.status(400).json({
-      success: false,
-      message: 'Validation error',
-      errors: validation.error.errors, // Return the zod validation errors
-    });
+  let profilePhotoUrl = null;
+  if (req.file) {
+    profilePhotoUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
   }
 
-  // Proceed with user creation if validation passes
-  const result = await UserServices.createUserIntoDB(req.body);
+  const userData: Partial<TUser> = {
+    ...req.body,
+    role: req.body.role || 'user',
+    profilePhoto: profilePhotoUrl,
+  };
 
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'User registered successfully',
-    data: {
-      ...result.toObject(),
-      password: undefined,
-    },
-  });
+  console.log('User data to create:', userData);
+
+  try {
+    const result = await UserServices.createUserIntoDB(
+      userData as TUser,
+      profilePhotoUrl,
+    );
+    const { password, ...userWithoutPassword } = result.toObject();
+
+    console.log('User created successfully:', userWithoutPassword); // Log the created user
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'User registered successfully',
+      data: userWithoutPassword,
+    });
+  } catch (err) {
+    console.error('Error creating user:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error while creating user.',
+    });
+  }
 });
 
 export const UserControllers = {

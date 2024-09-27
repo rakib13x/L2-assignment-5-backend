@@ -17,6 +17,7 @@ const loginUser = catchAsync(async (req, res) => {
       role: user.role,
       phone: user.phone,
       address: user.address,
+      profilePhoto: user.profilePhoto,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },
