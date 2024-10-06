@@ -10,6 +10,7 @@ export interface TCar {
   vehicleType: string;
   status: 'available' | 'not available';
   isDeleted: boolean;
+  bookingCount: number;
 }
 
 export interface CarFilters {

@@ -1,15 +1,14 @@
-/* eslint-disable prefer-const */
 import httpStatus from 'http-status';
-import { Types } from 'mongoose';
+import { isValidObjectId, Types } from 'mongoose';
 import { TBooking } from '../interface/booking.interface';
+import { CarModel } from '../model/car.model';
 import { BookingServices } from '../services/booking.service';
 import catchAsync from '../utils/catchAsync';
 import { isValidDate } from '../utils/isValidDate';
-import { isValidObjectId } from '../utils/isValidObjectId';
 import sendResponse from '../utils/sendResponse';
 import { createBookingValidationSchema } from '../validations/booking.validation';
 
-const createBooking = catchAsync(async (req, res) => {
+export const createBooking = catchAsync(async (req, res) => {
   const { endTime, totalCost, ...bookingData } = req.body;
   const userId = req.user._id;
 
@@ -113,7 +112,6 @@ const getAllBookings = catchAsync(async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let filter: any = {};
 
-  // Apply filters only if query parameters exist
   if (carId && isValidObjectId(carId as string)) {
     filter.car = carId as string;
   }
@@ -122,11 +120,9 @@ const getAllBookings = catchAsync(async (req, res) => {
     filter.date = new Date(date as string);
   }
 
-  // Fetch bookings based on the filter. If no filter, it will fetch all bookings.
   const bookings = await BookingServices.getAllBookingsfromdb(filter);
   console.log('Retrieved bookings:', bookings);
 
-  // If the database is empty or no bookings match the query
   if (bookings.length === 0) {
     return sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -139,7 +135,6 @@ const getAllBookings = catchAsync(async (req, res) => {
     });
   }
 
-  // Respond with bookings if found
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -202,11 +197,10 @@ export const updateBooking = catchAsync(async (req, res) => {
 
 export const cancelBooking = catchAsync(async (req, res) => {
   const bookingId = req.params.id;
-  const userId = req.user._id;
 
   const booking = await BookingServices.getBookingById(bookingId);
 
-  if (!booking || booking.user.toString() !== userId.toString()) {
+  if (!booking) {
     return sendResponse(res, {
       statusCode: httpStatus.NOT_FOUND,
       success: false,
@@ -226,10 +220,23 @@ export const cancelBooking = catchAsync(async (req, res) => {
 
   const canceledBooking = await BookingServices.cancelBookingService(bookingId);
 
+  if (!canceledBooking) {
+    return sendResponse(res, {
+      statusCode: httpStatus.NOT_FOUND,
+      success: false,
+      message: 'Failed to cancel the booking. Booking may not exist.',
+      data: null,
+    });
+  }
+
+  await CarModel.findByIdAndUpdate(canceledBooking.car, {
+    status: 'available',
+  });
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Booking canceled successfully.',
+    message: 'Booking canceled successfully and car is now available.',
     data: canceledBooking,
   });
 });
@@ -268,6 +275,22 @@ export const approveBooking = catchAsync(async (req, res) => {
   });
 });
 
+export const getBookingStats = catchAsync(async (req, res) => {
+  const totalPendingBookings = await BookingServices.getTotalPendingBookings();
+  const totalApprovedBookings =
+    await BookingServices.getTotalApprovedBookings();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking statistics retrieved successfully',
+    data: {
+      totalPendingBookings,
+      totalApprovedBookings,
+    },
+  });
+});
+
 export const bookingControllers = {
   createBooking,
   getMyBookings,
@@ -276,4 +299,5 @@ export const bookingControllers = {
   getBookingById,
   cancelBooking,
   approveBooking,
+  getBookingStats,
 };

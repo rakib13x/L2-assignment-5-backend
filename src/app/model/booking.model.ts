@@ -1,6 +1,24 @@
-// booking.model.ts
 import { Schema, model } from 'mongoose';
 import { TBooking } from '../interface/booking.interface';
+
+const personalInfoSchema = new Schema({
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, required: true },
+  address: { type: String, required: true },
+  city: { type: String, required: true },
+  region: { type: String, required: true },
+  zipCode: { type: String, required: true },
+  country: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  nidNumber: { type: String, required: true },
+  drivingLicense: { type: String, required: true },
+});
+
+const extraFeaturesSchema = new Schema({
+  insurance: { type: Boolean, default: false },
+  gps: { type: Boolean, default: false },
+});
 
 const bookingSchema = new Schema<TBooking>(
   {
@@ -32,14 +50,32 @@ const bookingSchema = new Schema<TBooking>(
       ref: 'Car',
       required: true,
     },
+    personalInfo: {
+      type: personalInfoSchema,
+    },
+    extraFeatures: {
+      type: extraFeaturesSchema,
+    },
     totalCost: {
+      type: Number,
+      default: 0,
+    },
+    carPricePerHour: {
+      type: Number,
+    },
+    additionalFeaturesCost: {
       type: Number,
       default: 0,
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'canceled'],
+      enum: ['pending', 'approved', 'cancelled'],
       default: 'pending',
+    },
+    payStatus: {
+      type: String,
+      enum: ['paid', 'unpaid'],
+      default: 'unpaid',
     },
   },
   { timestamps: true },

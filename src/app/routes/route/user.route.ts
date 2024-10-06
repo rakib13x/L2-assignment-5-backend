@@ -9,7 +9,7 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads/'); // Directory where images will be stored
+    cb(null, './uploads/');
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
@@ -31,7 +31,7 @@ router.post(
   UserControllers.createUser,
 );
 
-// User management routes
+// // User management routes
 router.patch('/:userId/make-admin', UserControllers.makeAdmin);
 router.patch('/:userId/make-user', UserControllers.makeUser);
 router.patch('/:userId/block', UserControllers.blockUser);

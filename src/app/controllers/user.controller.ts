@@ -27,8 +27,6 @@ const createUser = catchAsync(async (req, res) => {
     );
     const { password, ...userWithoutPassword } = result.toObject();
 
-    console.log('User created successfully:', userWithoutPassword); // Log the created user
-
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,

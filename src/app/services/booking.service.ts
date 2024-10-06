@@ -4,7 +4,7 @@ import { TBooking } from '../interface/booking.interface';
 import { BookingModel } from '../model/booking.model';
 import { CarModel } from '../model/car.model';
 
-const createBookingIntoDB = async (
+export const createBookingIntoDB = async (
   bookingData: Partial<Omit<TBooking, 'endTime' | 'totalCost'>>,
   userId: string,
 ) => {
@@ -25,6 +25,7 @@ const createBookingIntoDB = async (
   const existingBooking = await BookingModel.findOne({
     user: new Types.ObjectId(userId),
     endTime: null,
+    status: { $ne: 'cancelled' },
   });
 
   if (existingBooking) {
@@ -103,7 +104,7 @@ export const updateBooking = async (
 export const cancelBookingService = async (bookingId: string) => {
   return await BookingModel.findByIdAndUpdate(
     bookingId,
-    { status: 'canceled' },
+    { status: 'cancelled' },
     { new: true },
   )
     .populate('user', '_id name email')
@@ -122,6 +123,20 @@ export const approveBookingService = async (bookingId: string) => {
     .exec();
 };
 
+const getTotalPendingBookings = async () => {
+  const pendingBookingsCount = await BookingModel.countDocuments({
+    status: 'pending',
+  });
+  return pendingBookingsCount;
+};
+
+const getTotalApprovedBookings = async () => {
+  const approvedBookingsCount = await BookingModel.countDocuments({
+    status: 'approved',
+  });
+  return approvedBookingsCount;
+};
+
 export const BookingServices = {
   createBookingIntoDB,
   getMyBookingsFromDb,
@@ -130,4 +145,6 @@ export const BookingServices = {
   getBookingById,
   cancelBookingService,
   approveBookingService,
+  getTotalPendingBookings,
+  getTotalApprovedBookings,
 };

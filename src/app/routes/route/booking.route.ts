@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   '/',
-  // auth(USER_ROLE.user),
+  auth(USER_ROLE.user),
   validateRequest(createBookingValidationSchema),
   bookingControllers.createBooking,
 );
@@ -29,10 +29,15 @@ router.put(
   auth(USER_ROLE.user),
   bookingControllers.getBookingById,
 );
-router.delete('/my-bookings/:id', bookingControllers.cancelBooking);
+router.patch(
+  '/my-bookings/:id/cancel',
+  // auth(USER_ROLE.user),
+  bookingControllers.cancelBooking,
+);
 router.patch(
   '/approve/:id',
   auth(USER_ROLE.admin),
   bookingControllers.approveBooking,
 );
+router.get('/stats', bookingControllers.getBookingStats);
 export const BookingRoutes = router;

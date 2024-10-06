@@ -1,4 +1,3 @@
-// In src/models/car.model.ts
 import { Schema, model } from 'mongoose';
 import { TCar } from '../interface/car.interface';
 
@@ -48,6 +47,9 @@ const carSchema = new Schema<TCar>(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    bookingCount: {
+      type: Number,
     },
   },
   { timestamps: true },

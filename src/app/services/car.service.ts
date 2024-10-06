@@ -47,11 +47,6 @@ const getAllCarsFromDb = async (
 
     const totalPages = Math.ceil(total / limit);
 
-    console.log('Constructed Query:', query);
-    console.log('Filtered Results:', result.length);
-    console.log('Total Pages:', totalPages);
-    console.log('Current Page:', page);
-
     return { cars: result, total, totalPages };
   } catch (error: unknown) {
     console.error('Error fetching cars:', error);
