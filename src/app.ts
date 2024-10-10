@@ -11,13 +11,12 @@ import router from './app/routes';
 
 const app: Application = express();
 
-//parsers
 app.use(express.json());
 app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['https://assignmen-5-client.vercel.app'],
+    origin: 'https://assignmen-5-client.vercel.app',
     credentials: true,
   }),
 );

@@ -249,8 +249,8 @@ export const approveBooking = catchAsync(async (req, res) => {
   if (!booking) {
     return sendResponse(res, {
       statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: 'Booking not found.',
+      success: true,
+      message: 'You have not booked anything yet.',
       data: null,
     });
   }

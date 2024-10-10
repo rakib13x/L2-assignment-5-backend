@@ -61,9 +61,49 @@ const updateUserStatus = async (
   return user;
 };
 
+const updateUserIntodb = async (
+  userId: string,
+  updates: Partial<TUser>,
+  profilePhotoPath: string | null,
+) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  // Only update fields if they are provided
+  if (updates.name) user.name = updates.name;
+  if (updates.email) user.email = updates.email; // Be cautious with email updates
+  if (updates.phone) user.phone = updates.phone;
+  if (updates.address) user.address = updates.address;
+  if (updates.role) user.role = updates.role;
+  if (updates.status) user.status = updates.status;
+
+  // Handle optional profile photo update
+  if (profilePhotoPath) {
+    user.profilePhoto = profilePhotoPath;
+  }
+
+  try {
+    await user.save(); // Attempt to save the updated user
+  } catch (error: any) {
+    // Check for duplicate key error (email conflict)
+    if (error.code === 11000 && error.keyPattern?.email) {
+      throw new AppError(
+        400,
+        'Email already exists. Please use a different email.',
+      );
+    }
+    throw error; // Throw other errors
+  }
+
+  return user;
+};
+
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   updateUserRole,
   updateUserStatus,
+  updateUserIntodb,
 };

@@ -20,5 +20,27 @@ export const createUserValidationSchema = z.object({
   address: z
     .string()
     .min(2, { message: 'Address must be at least 2 characters long' }),
-  status: z.enum(['active', 'blocked']).optional().default('blocked'),
+  status: z.enum(['active', 'blocked']).optional().default('active'),
+});
+export const updateUserValidationSchema = z.object({
+  name: z
+    .string()
+    .min(5, { message: 'Name must be at least 5 characters long!' })
+    .optional(),
+  email: z
+    .string()
+    .email({ message: 'Invalid email address!' })
+    .min(8, { message: 'Email must be at least 8 characters long!' })
+    .optional(),
+  role: z.enum(['user', 'admin']).optional().default('user'),
+  phone: z
+    .string()
+    .min(10, { message: 'Phone number must be at least 10 characters long' })
+    .max(15, { message: 'Phone number cannot exceed 15 characters' })
+    .optional(),
+  address: z
+    .string()
+    .min(2, { message: 'Address must be at least 2 characters long' })
+    .optional(),
+  status: z.enum(['active', 'blocked']).optional().default('active'),
 });

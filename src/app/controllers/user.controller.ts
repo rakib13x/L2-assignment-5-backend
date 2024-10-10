@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import AppError from '../errors/AppError';
 import { TUser } from '../interface/user.interface';
 import { UserServices } from '../services/user.service';
 import catchAsync from '../utils/catchAsync';
@@ -8,8 +9,8 @@ const createUser = catchAsync(async (req, res) => {
   console.log('Processing signup...');
 
   let profilePhotoUrl = null;
-  if (req.file) {
-    profilePhotoUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  if (req.file && req.file.path) {
+    profilePhotoUrl = req.file.path;
   }
 
   const userData: Partial<TUser> = {
@@ -99,6 +100,49 @@ const activateUser = catchAsync(async (req, res) => {
   });
 });
 
+const updateUser = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const userUpdates: Partial<TUser> = req.body;
+
+  let profilePhotoUrl = null;
+  if (req.file && req.file.path) {
+    profilePhotoUrl = req.file.path;
+  }
+
+  try {
+    const updatedUser = await UserServices.updateUserIntodb(
+      userId,
+      userUpdates,
+      profilePhotoUrl,
+    );
+
+    if (!updatedUser) {
+      throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    const { password, ...userWithoutPassword } = updatedUser.toObject();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User updated successfully',
+      data: userWithoutPassword,
+    });
+  } catch (err: any) {
+    console.error('Error updating user:', err);
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists. Please choose another one.',
+      });
+    }
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error while updating user.',
+    });
+  }
+});
+
 export const UserControllers = {
   createUser,
   getAllUsers,
@@ -106,4 +150,5 @@ export const UserControllers = {
   makeUser,
   blockUser,
   activateUser,
+  updateUser,
 };
