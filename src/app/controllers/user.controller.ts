@@ -90,10 +90,22 @@ const blockUser = catchAsync(async (req, res) => {
   });
 });
 
+const activateUser = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const updatedUser = await UserServices.updateUserStatus(userId, 'active');
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User activated successfully',
+    data: updatedUser,
+  });
+});
+
 export const UserControllers = {
   createUser,
   getAllUsers,
   makeAdmin,
   makeUser,
   blockUser,
+  activateUser,
 };
