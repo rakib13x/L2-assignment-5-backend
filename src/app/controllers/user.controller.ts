@@ -79,9 +79,21 @@ const makeUser = catchAsync(async (req, res) => {
   });
 });
 
+const blockUser = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const updatedUser = await UserServices.updateUserStatus(userId, 'blocked');
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User blocked successfully',
+    data: updatedUser,
+  });
+});
+
 export const UserControllers = {
   createUser,
   getAllUsers,
   makeAdmin,
   makeUser,
+  blockUser,
 };

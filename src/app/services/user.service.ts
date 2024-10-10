@@ -46,8 +46,24 @@ const updateUserRole = async (userId: string, role: 'user' | 'admin') => {
   return user;
 };
 
+const updateUserStatus = async (
+  userId: string,
+  status: 'active' | 'blocked',
+) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  user.status = status;
+  await user.save();
+
+  return user;
+};
+
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   updateUserRole,
+  updateUserStatus,
 };

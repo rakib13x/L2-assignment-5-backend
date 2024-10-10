@@ -34,5 +34,6 @@ router.post(
 // User management routes
 router.patch('/:userId/make-admin', UserControllers.makeAdmin);
 router.patch('/:userId/make-user', UserControllers.makeUser);
+router.patch('/:userId/block', UserControllers.blockUser);
 
 export const UserRoutes = router;
