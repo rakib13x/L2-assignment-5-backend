@@ -1,3 +1,4 @@
+import AppError from '../errors/AppError';
 import { TUser } from '../interface/user.interface';
 import { User } from '../model/user.model';
 
@@ -33,7 +34,20 @@ const getAllUsersFromDB = async (page: number, limit: number) => {
   };
 };
 
+const updateUserRole = async (userId: string, role: 'user' | 'admin') => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  user.role = role;
+  await user.save();
+
+  return user;
+};
+
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
+  updateUserRole,
 };

@@ -57,8 +57,19 @@ const getAllUsers = catchAsync(async (req, res) => {
     data: usersData,
   });
 });
+const makeAdmin = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const updatedUser = await UserServices.updateUserRole(userId, 'admin');
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User promoted to admin successfully',
+    data: updatedUser,
+  });
+});
 
 export const UserControllers = {
   createUser,
   getAllUsers,
+  makeAdmin,
 };
