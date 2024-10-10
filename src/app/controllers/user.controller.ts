@@ -68,8 +68,20 @@ const makeAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const makeUser = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const updatedUser = await UserServices.updateUserRole(userId, 'user');
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User demoted to user successfully',
+    data: updatedUser,
+  });
+});
+
 export const UserControllers = {
   createUser,
   getAllUsers,
   makeAdmin,
+  makeUser,
 };

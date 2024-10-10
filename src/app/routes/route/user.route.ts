@@ -33,5 +33,6 @@ router.post(
 
 // User management routes
 router.patch('/:userId/make-admin', UserControllers.makeAdmin);
+router.patch('/:userId/make-user', UserControllers.makeUser);
 
 export const UserRoutes = router;
