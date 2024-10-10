@@ -9,10 +9,36 @@ import { parseStringArrayParam } from '../utils/ParseString';
 import sendResponse from '../utils/sendResponse';
 
 const createCars = catchAsync(async (req, res) => {
-  const result = await CarServices.createCarsIntoDB(req.body);
+  const carData = req.body;
 
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+  // Log the body and file for debugging
+  console.log('Request Body:', req.body); // Logs form data
+  console.log('Request File:', req.file); // Logs the uploaded file
+
+  // Convert `isElectric` to boolean
+  carData.isElectric = carData.isElectric === 'true';
+
+  // Convert `features` from string back to array (it's sent as a JSON string)
+  carData.features = JSON.parse(carData.features);
+
+  // Convert `pricePerHour` to number
+  carData.pricePerHour = parseFloat(carData.pricePerHour);
+
+  // Handle image upload
+  if (req.file && req.file.path) {
+    carData.image = req.file.path; // Set the image URL from Cloudinary
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: 'Image is required and was not uploaded',
+    });
+  }
+
+  // Now create the car entry in the database
+  const result = await CarServices.createCarsIntoDB(carData);
+
+  // Respond to the client with success message
+  res.status(201).json({
     success: true,
     message: 'Car created successfully',
     data: result,
@@ -25,13 +51,23 @@ const getAllCars = catchAsync(async (req, res) => {
 
   const manufacturers = parseStringArrayParam(req.query.manufacturers);
   const vehicleTypes = parseStringArrayParam(req.query.vehicleTypes);
-  const priceRange = parseNumberArrayParam(req.query.priceRange, [10, 155]);
 
+  // Check if priceRange is provided; default range will apply only if it's missing
+  const priceRange = parseNumberArrayParam(
+    req.query.priceRange,
+    [10, 99999999999999],
+  );
+
+  // Define filters dynamically
   const filters: CarFilters = {
     manufacturers,
     vehicleTypes,
-    priceRange,
   };
+
+  // Only apply price range filter if valid price range is provided
+  if (priceRange.length === 2 && priceRange[0] < priceRange[1]) {
+    filters.priceRange = priceRange;
+  }
 
   const { cars, totalPages, total } = await CarServices.getAllCarsFromDb(
     filters,

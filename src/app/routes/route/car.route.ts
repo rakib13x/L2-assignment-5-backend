@@ -1,4 +1,5 @@
 import express from 'express';
+import { multerUpload } from '../../config/multer.config';
 import { USER_ROLE } from '../../constants/user.constant';
 import { CarControllers } from '../../controllers/car.controller';
 import auth from '../../middlewares/auth';
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post(
   '/',
   // auth(USER_ROLE.admin),
+  multerUpload.single('image'),
   validateRequest(createCarValidationSchema),
   CarControllers.createCars,
 );
@@ -31,5 +33,9 @@ router.put(
   validateRequest(updateCarValidationSchema),
   CarControllers.updateCar,
 );
-router.delete('/:carId', auth(USER_ROLE.admin), CarControllers.deleteCar);
+router.delete(
+  '/:carId',
+  //  auth(USER_ROLE.admin),
+  CarControllers.deleteCar,
+);
 export const CarRoutes = router;

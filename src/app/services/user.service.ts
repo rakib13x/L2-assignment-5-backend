@@ -7,7 +7,7 @@ const createUserIntoDB = async (
 ) => {
   const userData = {
     ...user,
-    profilePhoto: profilePhotoPath || null, // Ensure profile photo is added
+    profilePhoto: profilePhotoPath || null,
   };
 
   const result = await User.create(userData);
