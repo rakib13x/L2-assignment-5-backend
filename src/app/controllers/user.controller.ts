@@ -44,6 +44,21 @@ const createUser = catchAsync(async (req, res) => {
   }
 });
 
+const getAllUsers = catchAsync(async (req, res) => {
+  const page = parseInt(req.query.page as string, 10) || 1;
+  const limit = parseInt(req.query.limit as string, 10) || 10;
+
+  const usersData = await UserServices.getAllUsersFromDB(page, limit);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users fetched successfully',
+    data: usersData,
+  });
+});
+
 export const UserControllers = {
   createUser,
+  getAllUsers,
 };

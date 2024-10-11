@@ -10,6 +10,7 @@ async function main() {
     await mongoose.connect(config.database_url as string);
 
     server = app.listen(config.port, () => {});
+    console.log(config.port);
   } catch (err) {
     return err;
   }

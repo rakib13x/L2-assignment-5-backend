@@ -10,6 +10,7 @@ export interface TUser {
   phone: string;
   address: string;
   profilePhoto: string | null;
+  status: 'active' | 'blocked';
   createdAt: string;
   updatedAt: string;
 }

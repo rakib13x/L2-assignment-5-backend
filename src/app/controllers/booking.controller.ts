@@ -108,11 +108,12 @@ export const getBookingById = catchAsync(async (req, res) => {
 
 const getAllBookings = catchAsync(async (req, res) => {
   const { carId, date } = req.query;
+  console.log('Incoming request query:', req.query);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //filter
   let filter: any = {};
 
+  // Apply filters only if query parameters exist
   if (carId && isValidObjectId(carId as string)) {
     filter.car = carId as string;
   }
@@ -121,17 +122,24 @@ const getAllBookings = catchAsync(async (req, res) => {
     filter.date = new Date(date as string);
   }
 
-  const bookings = await BookingServices.getAllBookings(filter);
+  // Fetch bookings based on the filter. If no filter, it will fetch all bookings.
+  const bookings = await BookingServices.getAllBookingsfromdb(filter);
+  console.log('Retrieved bookings:', bookings);
 
+  // If the database is empty or no bookings match the query
   if (bookings.length === 0) {
     return sendResponse(res, {
-      statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: 'No Data Found',
+      statusCode: httpStatus.OK,
+      success: true,
+      message:
+        filter && Object.keys(filter).length > 0
+          ? 'No bookings match the provided filters'
+          : 'No bookings available in the system',
       data: [],
     });
   }
 
+  // Respond with bookings if found
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

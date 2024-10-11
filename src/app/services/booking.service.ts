@@ -72,7 +72,7 @@ const getMyBookingsFromDb = async (userId: string) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getAllBookings = async (filter: any) => {
+const getAllBookingsfromdb = async (filter: any) => {
   const bookings = await BookingModel.find(filter)
     .populate('user', '_id name email role phone address')
     .populate('car')
@@ -125,7 +125,7 @@ export const approveBookingService = async (bookingId: string) => {
 export const BookingServices = {
   createBookingIntoDB,
   getMyBookingsFromDb,
-  getAllBookings,
+  getAllBookingsfromdb,
   updateBooking,
   getBookingById,
   cancelBookingService,

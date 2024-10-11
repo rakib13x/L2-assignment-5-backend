@@ -20,4 +20,5 @@ export const createUserValidationSchema = z.object({
   address: z
     .string()
     .min(2, { message: 'Address must be at least 2 characters long' }),
+  status: z.enum(['active', 'blocked']).optional().default('blocked'),
 });
