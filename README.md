@@ -24,9 +24,4 @@ This API allows users to book cars and administrators to manage car information 
 
 Check out the live demo of the API [https://car-rental-five-xi.vercel.app/](https://car-rental-five-xi.vercel.app/).
 
-## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your/repository.git
-   cd repository
